@@ -13,6 +13,9 @@ RUN go mod download
 # Build the Go application
 RUN go build -o server .
 
+# Ensure the built binary is executable
+RUN chmod +x server
+
 # Expose the port that the application listens on
 EXPOSE 4000
 
