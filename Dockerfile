@@ -14,7 +14,7 @@ RUN go mod download
 RUN go build -o server .
 
 # Expose the port that the application listens on
-EXPOSE 8080
+EXPOSE 4000
 
 # Set the command to run when the container starts
 CMD ["./server"]
