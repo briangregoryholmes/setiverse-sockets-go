@@ -11,8 +11,8 @@ import (
 )
 
 type Room struct {
-    Name        string
-    Connections map[*websocket.Conn]bool
+	Name        string
+	Connections map[*websocket.Conn]bool
 }
 
 type Message struct {
@@ -23,23 +23,31 @@ type Message struct {
 var rooms = make(map[string]*Room)
 
 var upgrader = websocket.Upgrader{
-    ReadBufferSize:  1024,
-    WriteBufferSize: 1024,
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
-        // Only allow connections from localhost
-        return true
-    },
+		// Only allow connections from localhost
+		return true
+	},
 }
 
 func main() {
-    http.HandleFunc("/", wsHandler)
+	http.HandleFunc("/", wsHandler)
+	http.HandleFunc("/health", healthCheckHandler)
 
-    fmt.Println("Starting server on :4000")
-    err := http.ListenAndServe(":4000", nil)
-    if err != nil {
-        log.Fatal("ListenAndServe: ", err)
-    }
+	fmt.Println("Starting server on :4000")
+	err := http.ListenAndServe(":4000", nil)
+	if err != nil {
+		log.Fatal("ListenAndServe: ", err)
+	}
 }
+
+func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"status":"OK"}`))
+}
+
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
     // Parse the room name from the URL path
