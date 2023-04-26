@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -32,8 +33,7 @@ var upgrader = websocket.Upgrader{
 }
 
 func main() {
-	http.HandleFunc("/", wsHandler)
-	http.HandleFunc("/health", healthCheckHandler)
+	http.HandleFunc("/", customHandler)
 
 	fmt.Println("Starting server on :4000")
 	err := http.ListenAndServe(":4000", nil)
@@ -42,16 +42,35 @@ func main() {
 	}
 }
 
+func customHandler(w http.ResponseWriter, r *http.Request) {
+	path := r.URL.Path
+
+	if path == "/health" {
+		healthCheckHandler(w, r)
+	} else if path == "/" {
+		rootHandler(w, r)
+	} else if strings.HasPrefix(path, "/game/") {
+		wsHandler(w, r)
+	} else {
+		http.NotFound(w, r)
+	}
+}
+
+// Health check handler for ALB
 func healthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"status":"OK"}`))
 }
 
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+    w.Write([]byte(`{"status":"Room ID Required"}`))
+}
+
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
     // Parse the room name from the URL path
-    roomName := r.URL.Path[len("/"):]
+    roomName := r.URL.Path[len("/game/"):]
 
 	// If no room name, refuse connection
 	if roomName == "" {

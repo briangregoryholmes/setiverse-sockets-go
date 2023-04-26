@@ -10,13 +10,21 @@ type: Environment
 network:
   vpc:
     cidr: 10.0.0.0/16
-  subnets:
-    private:
-      cidr: 10.0.1.0/24,10.0.2.0/24,10.0.3.0/24
-      availability_zones: us-east-1a,us-west-1b,us-west-1c
-    public:
-      cidr: 10.0.101.0/24,10.0.102.0/24,10.0.103.0/24
-      availability_zones: us-east-1a,us-west-1b,us-west-1c
+    subnets:
+      public:
+        - cidr: 10.0.101.0/24
+          az: us-east-1a
+        - cidr: 10.0.102.0/24
+          az: us-east-1b
+        - cidr: 10.0.103.0/24
+          az: us-east-1c
+      private:
+        - cidr: 10.0.0.0/24
+          az: us-east-1a
+        - cidr: 10.0.1.0/24
+          az: us-east-1b
+        - cidr: 10.0.2.0/24
+          az: us-east-1c
 
 # Configure the load balancers in your environment, once created.
 # http:

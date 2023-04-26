@@ -1,5 +1,5 @@
-# Use the official Go image as the base image
-FROM golang:1.17.5-alpine3.15
+# Use the official Go image as the base image for the build stage
+FROM golang:1.17.5-alpine3.15 AS build
 
 # Set the working directory
 WORKDIR /app
@@ -13,8 +13,24 @@ RUN go mod download
 # Build the Go application
 RUN go build -o server .
 
+# Use the official Alpine image as the base image for the final stage
+FROM alpine:3.15
+
+# Create a non-root user and set ownership of the app directory
+RUN adduser -D -g '' appuser
+RUN mkdir /app && chown appuser:appuser /app
+
+# Set the working directory
+WORKDIR /app
+
+# Copy the built binary from the build stage to the final stage
+COPY --from=build --chown=appuser:appuser /app/server /app/server
+
 # Ensure the built binary is executable
 RUN chmod +x server
+
+# Use the non-root user for running the container
+USER appuser
 
 # Expose the port that the application listens on
 EXPOSE 4000
