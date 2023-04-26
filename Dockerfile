@@ -1,5 +1,5 @@
 # Use the official Go image as the base image for the build stage
-FROM golang:1.17.5-alpine3.15 AS build
+FROM public.ecr.aws/docker/library/golang:latest AS build
 
 # Set the working directory
 WORKDIR /app
@@ -14,7 +14,7 @@ RUN go mod download
 RUN go build -o server .
 
 # Use the official Alpine image as the base image for the final stage
-FROM alpine:3.15
+FROM public.ecr.aws/docker/library/alpine:latest
 
 # Create a non-root user and set ownership of the app directory
 RUN adduser -D -g '' appuser
