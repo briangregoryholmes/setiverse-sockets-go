@@ -140,6 +140,7 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 
             // Broadcast the message to all clients in the room, except the sender
             for connOther := range room.Connections {
+                // Don't send the message back to the sender
                 if connOther == conn {
                     continue
                 }
